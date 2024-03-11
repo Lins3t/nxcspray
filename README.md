@@ -1,5 +1,5 @@
 # nxcspray
-Password spray Active Directory accounts with [netexec](https://github.com/Pennyw0rth/NetExec) according to reset counter and lockout threshold policies. 
+Password spraying with [netexec](https://github.com/Pennyw0rth/NetExec) according to reset counter and lockout threshold policies. 
 ### Usage
 ```
 flags:
