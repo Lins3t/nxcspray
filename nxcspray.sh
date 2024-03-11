@@ -2,7 +2,7 @@
 # Password spray AD accounts with netexec according to reset counter and lockout threshold policies
 # Author: (@kplei)
 
-which crackmapexec > /dev/null 2>&1
+which netexec > /dev/null 2>&1
 if [ $? == 1 ]; then
     echo "Can't find netexec. This tool requires it."
     exit
@@ -18,7 +18,7 @@ fi
 help() {
     echo "flags:"
     echo "-t: Target IP address or hostname"
-    echo "-m: Protocol - can be SMB/LDAP/RDP"
+    echo "-m: Method/Protocol - any protocol netexec can use (SMB, LDAP, RDP, etc.)"
     echo "-u: Username or username file"
     echo "-p: Password or password file"
     echo "-l: Account Lockout Threshold' value"
