@@ -27,7 +27,7 @@ help() {
     echo "-h: 'Print this help summary page"
     echo ""
     echo "Usage example:"
-    echo "cmespray-2.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -n 445"
+    echo "nxcspray-2.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -n 445"
 
 }
 
@@ -62,14 +62,14 @@ fi
 cp $passwords $passwords.tmp
 
 checkpwns () {
-    cat cmespray_output.txt | grep "[+]" 2>/dev/null
+    cat nxcspray_output.txt | grep "[+]" 2>/dev/null
     if [ $? == 0 ]; then
         echo "[+] Successful logins:"
-        cat cmespray_output.txt | grep "[+]"
+        cat nxcspray_output.txt | grep "[+]"
     else
         echo "[-] No successful logins."
     fi
-    cat cmespray_output.txt | grep "LOCKOUT" 2>/dev/null
+    cat nxcspray_output.txt | grep "LOCKOUT" 2>/dev/null
     if [ $? == 0 ]; then
         echo "[!] LOCKOUT DETECTED. EXITING."
         exit
