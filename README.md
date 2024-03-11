@@ -4,7 +4,7 @@ Password spray Active Directory accounts with [netexec](https://github.com/Penny
 ```
 flags:
 -t: Target IP address or hostname
--m: Protocol - any protocol netexec can use (SMB, LDAP, RDP, etc.)
+-m: Method/Protocol - any protocol netexec can use (SMB, LDAP, RDP, etc.)
 -u: Username or username file
 -p: Password or password file
 -l: Account Lockout Threshold' value
