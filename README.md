@@ -13,7 +13,7 @@ flags:
 -h: 'Print this help summary page
 
 Usage example:
-nxcspray-2.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -n 445
+nxcspray.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -n 445
 
 
 bash ../nxcspray/nxcspray.sh -t 10.0.1.10 -m smb -u ./test-users.txt -p ./test-pass.txt -l 3 -r 4 -n 445 
