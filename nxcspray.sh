@@ -28,7 +28,7 @@ help() {
     echo "-h: Print this help summary page"
     echo ""
     echo "Usage example:"
-    echo "bash ./nxcspray.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -l 5 -r 30 -d test.local -n 445"
+    echo "bash ./nxcspray.sh -t 10.1.1.1 -m smb -u ./users.txt -p ./passwords.txt -a 5 -i 30 -d test.local -n 445"
 
 }
 
