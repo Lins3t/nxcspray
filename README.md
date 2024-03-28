@@ -10,7 +10,7 @@ flags:
 -l: Number of passwords to be tested per delay cycle
 -r: Delay between unique passwords, in minutes
 -d: Domain - optional (uses target's default domain otherwise)
--n: 'Custom port number - optional
+-P: 'Custom port number - optional
 -h: 'Print this help summary page
 
 Usage example:
