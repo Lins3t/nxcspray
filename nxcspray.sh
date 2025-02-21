@@ -71,7 +71,8 @@ checkpwns () {
     else
         echo "[-] No successful logins."
     fi
-    cat nxcspray_output.txt | grep "LOCKOUT" 2>/dev/null
+
+    cat nxcspray_output.txt | grep -E "USER_ACCOUNT_LOCKED|STATUS_ACCOUNT_LOCKED_OUT" 2>/dev/null
     if [ $? == 0 ]; then
         echo "[!] LOCKOUT DETECTED. EXITING."
         exit
